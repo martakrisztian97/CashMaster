@@ -8,13 +8,18 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * Pénzrendező kalkulátor felülete.
@@ -27,6 +32,8 @@ public class CashMaster extends javax.swing.JFrame {
     private int myMoneyOfWallet2; // a pénztárca 2.-ből a saját részem
     private int balance; // egyenleg
     private RandomAccessFile raf;
+    private List<String> balances; // .csv-ből beolvasott egyenlegek
+    private DefaultTableModel dtm;
 
     /**
      * Creates new form CashMaster.
@@ -34,6 +41,9 @@ public class CashMaster extends javax.swing.JFrame {
     public CashMaster() {
         initComponents();
         this.setIconImage(Toolkit.getDefaultToolkit().getImage("src/view/images/creditcard.png"));
+        balances = new ArrayList<>();
+        dtm = (DefaultTableModel)balanceHistoryTable.getModel();
+        formattingTable();
     }
     
     /**
@@ -153,7 +163,7 @@ public class CashMaster extends javax.swing.JFrame {
         try {
             raf = new RandomAccessFile("balance.csv", "rw");
             raf.seek(raf.length());
-            raf.writeBytes(dateNow()+";"+balance+"\r\n");
+            raf.writeBytes(dateNow()+";"+String.format("%,d", balance)+"\r\n");
             raf.close();
         } catch (IOException e) {
             System.out.println("Hiba: " + e.getMessage());
@@ -163,8 +173,50 @@ public class CashMaster extends javax.swing.JFrame {
     /**
      * Beolvassa az egyenleg előzményeket a .csv fájlból.
      */
-    public void readBalanceCSV() {
-       
+    public void readBalancesFromCSVToTable() {
+        String row;
+        balances.removeAll(balances);
+        try {
+            raf = new RandomAccessFile("balance.csv", "r");
+            row = raf.readLine();
+            while (row != null) {
+                balances.add(row);
+                row = raf.readLine();
+            }
+            raf.close();
+        } catch (IOException e) {
+            System.out.println("Hiba: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Táblázat feltöltése idő szerinti csökkenő sorrendben.
+     */
+    public void fillTable() {
+        // táblázat kiűrítése
+        for (int i = dtm.getRowCount() - 1; i >= 0; i--) {
+            dtm.removeRow(i);
+        }
+        
+        // táblázat feltöltése
+        Object[] row = new Object[2];
+        for (int i = balances.size()-1; i >= 0; i--) {
+            row[0] = balances.get(i).split(";")[0];
+            row[1] = balances.get(i).split(";")[1]+" HUF";
+            dtm.addRow(row);
+        }
+    }
+    
+    /**
+     * Táblázat megjelenésének formázása.
+     */
+    public void formattingTable() {
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        balanceHistoryTable.getColumnModel().getColumn(0).setHeaderRenderer(centerRenderer);
+        balanceHistoryTable.getColumnModel().getColumn(1).setHeaderRenderer(centerRenderer);
+        balanceHistoryTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        balanceHistoryTable.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
     }
 
     /**
@@ -218,16 +270,20 @@ public class CashMaster extends javax.swing.JFrame {
         saveBalanceButton = new javax.swing.JButton();
         balanceHistoryPanel = new javax.swing.JPanel();
         logoLabel2 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        balanceHistoryScrollPane = new javax.swing.JScrollPane();
+        balanceHistoryTable = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("CashMaster, a pénzrendező kalkulátor");
         setMaximumSize(new java.awt.Dimension(800, 900));
         setMinimumSize(new java.awt.Dimension(800, 900));
-        setPreferredSize(new java.awt.Dimension(800, 900));
         setResizable(false);
         setSize(new java.awt.Dimension(800, 900));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         jTabbedPane.setFocusable(false);
@@ -756,7 +812,12 @@ public class CashMaster extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(25, 25, 25, 25);
         balanceHistoryPanel.add(logoLabel2, gridBagConstraints);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        balanceHistoryScrollPane.setMaximumSize(new java.awt.Dimension(450, 700));
+        balanceHistoryScrollPane.setMinimumSize(new java.awt.Dimension(450, 700));
+        balanceHistoryScrollPane.setPreferredSize(new java.awt.Dimension(450, 700));
+
+        balanceHistoryTable.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        balanceHistoryTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -765,7 +826,7 @@ public class CashMaster extends javax.swing.JFrame {
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
                 false, false
@@ -779,13 +840,14 @@ public class CashMaster extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
+        balanceHistoryTable.setRowHeight(40);
+        balanceHistoryScrollPane.setViewportView(balanceHistoryTable);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new java.awt.Insets(25, 25, 25, 25);
-        balanceHistoryPanel.add(jScrollPane1, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(0, 25, 25, 25);
+        balanceHistoryPanel.add(balanceHistoryScrollPane, gridBagConstraints);
 
         jTabbedPane.addTab("Egyenleg előzmények", balanceHistoryPanel);
 
@@ -901,7 +963,14 @@ public class CashMaster extends javax.swing.JFrame {
     private void saveBalanceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveBalanceButtonActionPerformed
         saveBalanceToIMG();
         saveBalanceToCSV();
+        readBalancesFromCSVToTable();
+        fillTable();
     }//GEN-LAST:event_saveBalanceButtonActionPerformed
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        readBalancesFromCSVToTable();
+        fillTable();
+    }//GEN-LAST:event_formWindowOpened
 
     /**
      * @param args the command line arguments
@@ -941,6 +1010,8 @@ public class CashMaster extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField allAmountWallet2TextField;
     private javax.swing.JPanel balanceHistoryPanel;
+    private javax.swing.JScrollPane balanceHistoryScrollPane;
+    private javax.swing.JTable balanceHistoryTable;
     private javax.swing.JLabel balanceLabel;
     private javax.swing.JPanel calculatorPanel;
     private javax.swing.JButton clearMainItemsButton;
@@ -968,9 +1039,7 @@ public class CashMaster extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane;
-    private javax.swing.JTable jTable1;
     private javax.swing.JLabel logoLabel1;
     private javax.swing.JLabel logoLabel2;
     private javax.swing.JPanel mainItemsPanel;
