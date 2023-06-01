@@ -148,7 +148,7 @@ public class CashMaster extends javax.swing.JFrame {
         BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
         this.paint(img.getGraphics());
         String filename = dateNow().replace(":", "").replace(" ", "_");
-        File outputFile = new File("balances/"+filename+".png");
+        File outputFile = new File("D:/Saját programok/CashMaster/CashMaster/balances/"+filename+".png");
         try {
             ImageIO.write(img, "png", outputFile);
         } catch (IOException ex) {
@@ -161,7 +161,7 @@ public class CashMaster extends javax.swing.JFrame {
      */
     public void saveBalanceToCSV() {
         try {
-            raf = new RandomAccessFile("balance.csv", "rw");
+            raf = new RandomAccessFile("D:/Saját programok/CashMaster/CashMaster/balance.csv", "rw");
             raf.seek(raf.length());
             raf.writeBytes(dateNow()+";"+String.format("%,d", balance)+"\r\n");
             raf.close();
@@ -177,7 +177,7 @@ public class CashMaster extends javax.swing.JFrame {
         String row;
         balances.removeAll(balances);
         try {
-            raf = new RandomAccessFile("balance.csv", "r");
+            raf = new RandomAccessFile("D:/Saját programok/CashMaster/CashMaster/balance.csv", "r");
             row = raf.readLine();
             while (row != null) {
                 balances.add(row);
