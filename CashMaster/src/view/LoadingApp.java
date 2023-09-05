@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.Toolkit;
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +15,7 @@ public class LoadingApp extends javax.swing.JFrame {
      */
     public LoadingApp() {
         initComponents();
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage("src/view/images/creditcard.png"));
         cm = new CashMaster();
         startProgressBar();
     }
