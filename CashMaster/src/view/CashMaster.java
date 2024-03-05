@@ -30,6 +30,7 @@ public class CashMaster extends javax.swing.JFrame {
     
     private int AmountOfCoins; // érmék összege
     private int myMoneyOfWallet2; // a pénztárca 2.-ből a saját részem
+    private int revolutBalance; // összegzett Revolut egyenleg
     private int balance; // egyenleg
     private RandomAccessFile raf;
     private List<String> balances; // .csv-ből beolvasott egyenlegek
@@ -40,7 +41,7 @@ public class CashMaster extends javax.swing.JFrame {
      */
     public CashMaster() {
         initComponents();
-        this.setIconImage(Toolkit.getDefaultToolkit().getImage("src/view/images/creditcard.png"));
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage("D:/Saját programok/CashMaster/CashMaster/src/view/images/creditcard.png"));
         balances = new ArrayList<>();
         dtm = (DefaultTableModel)balanceHistoryTable.getModel();
         formattingTable();
@@ -104,6 +105,26 @@ public class CashMaster extends javax.swing.JFrame {
     }
     
     /**
+     * Kiszámolja az összes Revolut egyenleget.
+     */
+    public void calculateRevolut() {
+        String accountRevolutText = accountRevolutTextField.getText(); // beviteli mező szövege
+        String cryptoRevolutText = cryptoRevolutTextField.getText(); // beviteli mező szövege
+        int accountRevolutAmount, cryptoRevolutAmount; // beviteli mező szövegének megfelelő összeg
+        
+        
+        if (accountRevolutText.isEmpty()) accountRevolutAmount = 0;
+        else accountRevolutAmount = Integer.parseInt(accountRevolutText);
+        
+        if (cryptoRevolutText.isEmpty()) cryptoRevolutAmount = 0;
+        else cryptoRevolutAmount = Integer.parseInt(cryptoRevolutText);
+        
+        revolutBalance = accountRevolutAmount+cryptoRevolutAmount;
+        revolutTextField.setText(revolutBalance+"");
+        calculateBalance();
+    }
+    
+    /**
      * Kiszámolja az egyenleget.
      */
     public void calculateBalance() {
@@ -126,7 +147,7 @@ public class CashMaster extends javax.swing.JFrame {
         if (reductionText.isEmpty()) reductionAmount = 0;
         else reductionAmount = Integer.parseInt(reductionText);
         
-        balance = creditCardAmount+walletAmount+myMoneyOfWallet2+AmountOfCoins+otherAmount-reductionAmount;
+        balance = creditCardAmount+walletAmount+myMoneyOfWallet2+AmountOfCoins+revolutBalance+otherAmount-reductionAmount;
         balanceLabel.setText("EGYENLEG: "+String.format("%,d", balance)+" HUF");
     }
     
@@ -238,11 +259,13 @@ public class CashMaster extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         creditCardTextField = new javax.swing.JTextField();
         walletTextField = new javax.swing.JTextField();
         wallet2TextField = new javax.swing.JTextField();
         coinsTextField = new javax.swing.JTextField();
+        revolutTextField = new javax.swing.JTextField();
         otherTextField = new javax.swing.JTextField();
         reductionTextField = new javax.swing.JTextField();
         clearMainItemsButton = new javax.swing.JButton();
@@ -268,6 +291,12 @@ public class CashMaster extends javax.swing.JFrame {
         toNullCoinsButton = new javax.swing.JButton();
         balanceLabel = new javax.swing.JLabel();
         saveBalanceButton = new javax.swing.JButton();
+        revolutPanel = new javax.swing.JPanel();
+        jLabel15 = new javax.swing.JLabel();
+        jLabel16 = new javax.swing.JLabel();
+        accountRevolutTextField = new javax.swing.JTextField();
+        cryptoRevolutTextField = new javax.swing.JTextField();
+        clearRevolutButton = new javax.swing.JButton();
         balanceHistoryPanel = new javax.swing.JPanel();
         logoLabel2 = new javax.swing.JLabel();
         balanceHistoryScrollPane = new javax.swing.JScrollPane();
@@ -275,10 +304,11 @@ public class CashMaster extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("CashMaster, a pénzrendező kalkulátor");
-        setMaximumSize(new java.awt.Dimension(800, 900));
-        setMinimumSize(new java.awt.Dimension(800, 900));
+        setMaximumSize(new java.awt.Dimension(800, 950));
+        setMinimumSize(new java.awt.Dimension(800, 950));
+        setPreferredSize(new java.awt.Dimension(800, 950));
         setResizable(false);
-        setSize(new java.awt.Dimension(800, 900));
+        setSize(new java.awt.Dimension(800, 950));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
@@ -341,19 +371,27 @@ public class CashMaster extends javax.swing.JFrame {
         mainItemsPanel.add(jLabel4, gridBagConstraints);
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel5.setText("Egyéb");
+        jLabel5.setText("Revolut");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 2;
         mainItemsPanel.add(jLabel5, gridBagConstraints);
 
+        jLabel17.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel17.setText("Egyéb");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridwidth = 2;
+        mainItemsPanel.add(jLabel17, gridBagConstraints);
+
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 0, 0));
         jLabel6.setText("Csökkentés");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.gridwidth = 2;
         mainItemsPanel.add(jLabel6, gridBagConstraints);
 
@@ -427,6 +465,21 @@ public class CashMaster extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(0, 25, 10, 25);
         mainItemsPanel.add(coinsTextField, gridBagConstraints);
 
+        revolutTextField.setEditable(false);
+        revolutTextField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        revolutTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        revolutTextField.setText("0");
+        revolutTextField.setFocusable(false);
+        revolutTextField.setMaximumSize(new java.awt.Dimension(150, 40));
+        revolutTextField.setMinimumSize(new java.awt.Dimension(150, 40));
+        revolutTextField.setPreferredSize(new java.awt.Dimension(150, 40));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 25, 10, 25);
+        mainItemsPanel.add(revolutTextField, gridBagConstraints);
+
         otherTextField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         otherTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         otherTextField.setMaximumSize(new java.awt.Dimension(150, 40));
@@ -442,7 +495,7 @@ public class CashMaster extends javax.swing.JFrame {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 11;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.insets = new java.awt.Insets(0, 25, 10, 25);
         mainItemsPanel.add(otherTextField, gridBagConstraints);
@@ -463,7 +516,7 @@ public class CashMaster extends javax.swing.JFrame {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridy = 13;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.insets = new java.awt.Insets(0, 25, 0, 25);
         mainItemsPanel.add(reductionTextField, gridBagConstraints);
@@ -484,7 +537,7 @@ public class CashMaster extends javax.swing.JFrame {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridy = 14;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.insets = new java.awt.Insets(25, 25, 25, 25);
         mainItemsPanel.add(clearMainItemsButton, gridBagConstraints);
@@ -492,6 +545,7 @@ public class CashMaster extends javax.swing.JFrame {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = 2;
         gridBagConstraints.insets = new java.awt.Insets(0, 25, 0, 10);
         calculatorPanel.add(mainItemsPanel, gridBagConstraints);
 
@@ -581,7 +635,7 @@ public class CashMaster extends javax.swing.JFrame {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 10);
         calculatorPanel.add(wallet2Panel, gridBagConstraints);
 
         coinsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Érmék", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 16))); // NOI18N
@@ -761,16 +815,17 @@ public class CashMaster extends javax.swing.JFrame {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 25);
         calculatorPanel.add(coinsPanel, gridBagConstraints);
 
         balanceLabel.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         balanceLabel.setForeground(new java.awt.Color(0, 128, 0));
-        balanceLabel.setText("Egyenleg: 0 HUF");
+        balanceLabel.setText("EGYENLEG: 0 HUF");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.insets = new java.awt.Insets(25, 0, 0, 0);
         calculatorPanel.add(balanceLabel, gridBagConstraints);
@@ -778,13 +833,13 @@ public class CashMaster extends javax.swing.JFrame {
         saveBalanceButton.setBackground(new java.awt.Color(0, 128, 0));
         saveBalanceButton.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         saveBalanceButton.setForeground(new java.awt.Color(255, 255, 255));
-        saveBalanceButton.setText("<html>EGYENLEG<br>MENTÉSE</html>");
+        saveBalanceButton.setText("EGYENLEG MENTÉSE");
         saveBalanceButton.setToolTipText("");
         saveBalanceButton.setBorderPainted(false);
         saveBalanceButton.setFocusable(false);
-        saveBalanceButton.setMaximumSize(new java.awt.Dimension(140, 40));
-        saveBalanceButton.setMinimumSize(new java.awt.Dimension(140, 40));
-        saveBalanceButton.setPreferredSize(new java.awt.Dimension(140, 50));
+        saveBalanceButton.setMaximumSize(new java.awt.Dimension(200, 50));
+        saveBalanceButton.setMinimumSize(new java.awt.Dimension(200, 50));
+        saveBalanceButton.setPreferredSize(new java.awt.Dimension(200, 50));
         saveBalanceButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveBalanceButtonActionPerformed(evt);
@@ -792,10 +847,99 @@ public class CashMaster extends javax.swing.JFrame {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.insets = new java.awt.Insets(25, 0, 25, 0);
         calculatorPanel.add(saveBalanceButton, gridBagConstraints);
+
+        revolutPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Revolut", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 16))); // NOI18N
+        revolutPanel.setLayout(new java.awt.GridBagLayout());
+
+        jLabel15.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel15.setText("Számlák");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.insets = new java.awt.Insets(25, 0, 0, 0);
+        revolutPanel.add(jLabel15, gridBagConstraints);
+
+        jLabel16.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel16.setText("Crypto");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        revolutPanel.add(jLabel16, gridBagConstraints);
+
+        accountRevolutTextField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        accountRevolutTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        accountRevolutTextField.setMaximumSize(new java.awt.Dimension(150, 40));
+        accountRevolutTextField.setMinimumSize(new java.awt.Dimension(150, 40));
+        accountRevolutTextField.setPreferredSize(new java.awt.Dimension(150, 40));
+        accountRevolutTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                accountRevolutTextFieldKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                accountRevolutTextFieldKeyTyped(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 25, 10, 25);
+        revolutPanel.add(accountRevolutTextField, gridBagConstraints);
+
+        cryptoRevolutTextField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        cryptoRevolutTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        cryptoRevolutTextField.setMaximumSize(new java.awt.Dimension(150, 40));
+        cryptoRevolutTextField.setMinimumSize(new java.awt.Dimension(150, 40));
+        cryptoRevolutTextField.setPreferredSize(new java.awt.Dimension(150, 40));
+        cryptoRevolutTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                cryptoRevolutTextFieldKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                cryptoRevolutTextFieldKeyTyped(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 25, 0, 25);
+        revolutPanel.add(cryptoRevolutTextField, gridBagConstraints);
+
+        clearRevolutButton.setBackground(new java.awt.Color(255, 82, 82));
+        clearRevolutButton.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        clearRevolutButton.setForeground(new java.awt.Color(255, 255, 255));
+        clearRevolutButton.setText("TÖRÖL");
+        clearRevolutButton.setBorderPainted(false);
+        clearRevolutButton.setFocusable(false);
+        clearRevolutButton.setMaximumSize(new java.awt.Dimension(140, 40));
+        clearRevolutButton.setMinimumSize(new java.awt.Dimension(140, 40));
+        clearRevolutButton.setPreferredSize(new java.awt.Dimension(140, 40));
+        clearRevolutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearRevolutButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.insets = new java.awt.Insets(25, 25, 25, 25);
+        revolutPanel.add(clearRevolutButton, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 10);
+        calculatorPanel.add(revolutPanel, gridBagConstraints);
+        revolutPanel.getAccessibleContext().setAccessibleName("Revolut");
 
         jTabbedPane.addTab("Kalkulátor", calculatorPanel);
 
@@ -972,6 +1116,31 @@ public class CashMaster extends javax.swing.JFrame {
         fillTable();
     }//GEN-LAST:event_formWindowOpened
 
+    private void accountRevolutTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_accountRevolutTextFieldKeyReleased
+        only7CharacterInJTextfield(accountRevolutTextField);
+        calculateRevolut();
+    }//GEN-LAST:event_accountRevolutTextFieldKeyReleased
+
+    private void accountRevolutTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_accountRevolutTextFieldKeyTyped
+        onlyNumbersInJTextfield(evt);
+    }//GEN-LAST:event_accountRevolutTextFieldKeyTyped
+
+    private void cryptoRevolutTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cryptoRevolutTextFieldKeyReleased
+        only7CharacterInJTextfield(cryptoRevolutTextField);
+        calculateRevolut();
+    }//GEN-LAST:event_cryptoRevolutTextFieldKeyReleased
+
+    private void cryptoRevolutTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cryptoRevolutTextFieldKeyTyped
+        onlyNumbersInJTextfield(evt);
+    }//GEN-LAST:event_cryptoRevolutTextFieldKeyTyped
+
+    private void clearRevolutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearRevolutButtonActionPerformed
+        accountRevolutTextField.setText("");
+        cryptoRevolutTextField.setText("");
+        accountRevolutTextField.requestFocus();
+        calculateRevolut();
+    }//GEN-LAST:event_clearRevolutButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1008,6 +1177,7 @@ public class CashMaster extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField accountRevolutTextField;
     private javax.swing.JTextField allAmountWallet2TextField;
     private javax.swing.JPanel balanceHistoryPanel;
     private javax.swing.JScrollPane balanceHistoryScrollPane;
@@ -1015,10 +1185,12 @@ public class CashMaster extends javax.swing.JFrame {
     private javax.swing.JLabel balanceLabel;
     private javax.swing.JPanel calculatorPanel;
     private javax.swing.JButton clearMainItemsButton;
+    private javax.swing.JButton clearRevolutButton;
     private javax.swing.JButton clearWallet2Button;
     private javax.swing.JPanel coinsPanel;
     private javax.swing.JTextField coinsTextField;
     private javax.swing.JTextField creditCardTextField;
+    private javax.swing.JTextField cryptoRevolutTextField;
     private javax.swing.JSpinner forint100Spinner;
     private javax.swing.JSpinner forint10Spinner;
     private javax.swing.JSpinner forint200Spinner;
@@ -1031,6 +1203,9 @@ public class CashMaster extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1046,6 +1221,8 @@ public class CashMaster extends javax.swing.JFrame {
     private javax.swing.JTextField otherTextField;
     private javax.swing.JTextField reductionTextField;
     private javax.swing.JTextField reductionWallet2TextField;
+    private javax.swing.JPanel revolutPanel;
+    private javax.swing.JTextField revolutTextField;
     private javax.swing.JButton saveBalanceButton;
     private javax.swing.JButton toNullCoinsButton;
     private javax.swing.JPanel wallet2Panel;
