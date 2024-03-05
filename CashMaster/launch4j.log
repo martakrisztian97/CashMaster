@@ -1,0 +1,33 @@
+
+
+Version:	3.50
+CmdLine:	D:\Saját programok\CashMaster\CashMaster\CashMaster.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	D:\Saját programok\CashMaster\CashMaster\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	1.008.000
+Java max ver:	
+Substitute:	JAVA_HOME = 
+Substitute:	PATH = C:\ProgramData\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;D:\Programok\Git\cmd;D:\Programok\Tortoise Git\bin;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Users\marta\AppData\Local\Microsoft\WindowsApps;D:\Programok\Visual Studio Code\bin;D:\Programok\IntelliJ IDEA Community Edition 2022.3.2\bin;;D:\Programok\Brackets\;;D:\Programok\Java\jre1.8.0_111\bin
+JRE paths:	;C:\ProgramData\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;D:\Programok\Git\cmd;D:\Programok\Tortoise Git\bin;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Users\marta\AppData\Local\Microsoft\WindowsApps;D:\Programok\Visual Studio Code\bin;D:\Programok\IntelliJ IDEA Community Edition 2022.3.2\bin;;D:\Programok\Brackets\;;D:\Programok\Java\jre1.8.0_111\bin
+Check launcher:	C:\ProgramData\Oracle\Java\javapath\bin\javaw.exe (not found)
+Check launcher:	C:\WINDOWS\system32\bin\javaw.exe (not found)
+Check launcher:	C:\WINDOWS\bin\javaw.exe (not found)
+Check launcher:	C:\WINDOWS\System32\Wbem\bin\javaw.exe (not found)
+Check launcher:	C:\WINDOWS\System32\WindowsPowerShell\v1.0\bin\javaw.exe (not found)
+Check launcher:	C:\WINDOWS\System32\OpenSSH\bin\javaw.exe (not found)
+Check launcher:	D:\Programok\Git\cmd\bin\javaw.exe (not found)
+Check launcher:	D:\Programok\Tortoise Git\bin\javaw.exe (not found)
+Check launcher:	C:\Program Files\Microsoft SQL Server\150\Tools\Binn\bin\javaw.exe (not found)
+Check launcher:	C:\Users\marta\AppData\Local\Microsoft\WindowsApps\bin\javaw.exe (not found)
+Check launcher:	D:\Programok\Visual Studio Code\bin\javaw.exe (not found)
+Check launcher:	D:\Programok\IntelliJ IDEA Community Edition 2022.3.2\bin\javaw.exe (not found)
+Check launcher:	D:\Programok\Brackets\bin\javaw.exe (not found)
+Check launcher:	D:\Programok\Java\jre1.8.0_111\bin\javaw.exe (OK)
+Version string: 1.008.000_111 / 64-Bit (OK)
+Launcher:	D:\Programok\Java\jre1.8.0_111\bin\javaw.exe
+Launcher args:	-jar "D:\Saját programok\CashMaster\CashMaster\CashMaster.exe"
+Args length:	62/32768 chars
+Exit code:	0
